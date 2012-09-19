@@ -2,22 +2,45 @@ require "rubygems"
 require "ri_cal"
 require "nokogiri"
 require "open-uri"
+require "sanitize"
+require "date"
+require "time"
 
-doc = Nokogiri::XML(open "http://www.mta.info/status/serviceStatus.txt")
-doc.css("line").map do |line|
-  puts line.css("name").first.content + " \t " + line.css("status").first.content
+
+class String
+  def titleize
+    split(/(\W)/).map(&:capitalize).join
+  end
 end
 
-cal = RiCal.Calendar do
-    event do
-      description "MA-6 First US Manned Spaceflight"
-      dtstart     DateTime.parse("2/20/1962 14:47:39")
-      dtend       DateTime.parse("2/20/1962 19:43:02")
-      location    "Cape Canaveral"
-      add_attendee "john.glenn@nasa.gov"
-      alarm do
-        description "Segment 51"
-      end
-    end
+def douchebag(name)
+    name =~ /\s|[a-z]|SIR/
+end
+
+
+def bus(name)
+    name =~ / - /
+end
+
+doc = Nokogiri::XML(open "http://www.mta.info/status/serviceStatus.txt")
+cal = RiCal.Calendar 
+
+
+doc.css("line").map do |line|
+  name =  line.css("name").first.content
+  status = line.css("status").first.content
+  text = Sanitize.clean( line.css("text").first.content ).strip
+  #puts "#{name} #{status} #{text}"
+  if status != "GOOD SERVICE" and
+    not douchebag name and not bus name
+        cal.events << RiCal.Event do
+            summary "#{name} #{status.titleize}"
+            dtstart     (DateTime.parse(Time.now.to_s)).to_date
+            dtend       (DateTime.parse(Time.now.to_s) + 1).to_date
+            location    name
+            description  text 
+        end
   end
+end
+
 puts cal

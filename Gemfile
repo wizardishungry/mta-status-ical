@@ -5,7 +5,7 @@ source "http://rubygems.org"
 
 gem "ri_cal", ">= 0"
 gem "nokogiri", ">= 0"
-
+gem "sanitize", ">= 0"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
