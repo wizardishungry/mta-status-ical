@@ -23,7 +23,9 @@ def bus(name)
 end
 
 doc = Nokogiri::XML(open "http://www.mta.info/status/serviceStatus.txt")
-cal = RiCal.Calendar 
+
+cal = RiCal.Calendar do
+end
 
 
 doc.css("line").map do |line|
@@ -38,7 +40,7 @@ doc.css("line").map do |line|
             dtstart     (DateTime.parse(Time.now.to_s)).to_date
             dtend       (DateTime.parse(Time.now.to_s) + 1).to_date
             location    name
-            description  text 
+            description text 
         end
   end
 end
