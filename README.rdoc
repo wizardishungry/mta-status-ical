@@ -1,6 +1,7 @@
 = mta-status-ical
 
-Description goes here.
+See http://jonwillia.ms/webdev/2012/09/19/mta-subway-icalendar-feed-iphone/
+
 
 == Contributing to mta-status-ical
  
