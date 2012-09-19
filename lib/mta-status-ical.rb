@@ -25,8 +25,9 @@ end
 doc = Nokogiri::XML(open "http://www.mta.info/status/serviceStatus.txt")
 
 cal = RiCal.Calendar do
+    add_x_property 'X-WR-CALNAME', 'MTA Subway Delays'
+    add_x_property 'X-PUBLISHED-TTL', 'PT1M'
 end
-
 
 doc.css("line").map do |line|
   name =  line.css("name").first.content
