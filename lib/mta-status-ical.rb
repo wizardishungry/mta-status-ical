@@ -43,15 +43,22 @@ doc.css("line").map do |line|
   name =  line.css("name").first.content
   status = line.css("status").first.content
   text = Sanitize.clean( line.css("text").first.content ).strip
-  #puts "#{name} #{status} #{text}"
+  dt = line.css('Date').first.content + line.css('Time').first.content
+  dt.strip!
+  #puts "DEBUG #{name} #{status} #{text} #{dt}"
   if status != "GOOD SERVICE" and
     not douchebag name and not bus name
         cal.events << RiCal.Event do
             summary "#{name} #{status.titleize}"
-            dtstart     (DateTime.parse(Time.now.to_s)).to_date
+            dtstart     (DateTime.parse(dt!='' ? dt : Time.now.to_s)).to_date
             dtend       (DateTime.parse(Time.now.to_s) + 1).to_date
             location    name
             description text 
+			if not status =~ /Planned/
+			  alarm do
+			    description "FF #{name} #{status.titleize}"
+			  end
+			end
         end
   end
 end
