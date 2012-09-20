@@ -15,17 +15,16 @@ end
 class RiCal::Component::Calendar
   def export_x_properties_to(export_stream) #:nodoc:
     x_properties.each do |name, props|
-	  props.each do | prop |
-		export_stream.puts("#{name}#{prop}")
-	  end
-	end
+			props.each do | prop |
+				export_stream.puts("#{name}#{prop}")
+			end
+		end
   end
 end
 
 def douchebag(name)
     name =~ /\s|[a-z]|SIR/
 end
-
 
 def bus(name)
     name =~ / - /
@@ -49,36 +48,41 @@ doc.css("line").map do |line|
   dt.strip!
 
   def dt_end_offset(dt)
-	if dt.hour >= 12 or DateTime.now-dt > 1.0
-	  2
-	else
-	  1
-	end
+		if dt.hour >= 12 or DateTime.now-dt > 1.0
+			2
+		else
+			1
+		end
   end
 
   if dt == ''
-	dt = DateTime.parse(Time.now.to_s).to_date
-	dtend = (DateTime.now + dt_end_offset(DateTime.now)).to_date
+		dt = DateTime.parse(Time.now.to_s).to_date
+		dtend = (DateTime.now + dt_end_offset(DateTime.now)).to_date
   else
-	dt = DateTime.parse(dt).to_datetime
-	dtend = DateTime.parse( (DateTime.now + dt_end_offset(dt) ).to_date.to_s )
+		dt = DateTime.parse(dt).to_datetime
+		dtend = DateTime.parse( (DateTime.now + dt_end_offset(dt) ).to_date.to_s )
   end
 
-  if status != "GOOD SERVICE" and
-    not douchebag name and not bus name
-        cal.events << RiCal.Event do
-            summary "#{name} #{status.titleize}"
-            dtstart     dt
+	if text =~ /until ([[:alpha:]]{3} \d+)/
+		puts "FF #{$1}"
+	end
+
+  if status != "GOOD SERVICE" and not douchebag name and not bus name
+		cal.events << RiCal.Event do
+			summary "#{name} #{status.titleize}"
+			dtstart     dt
 			dtend       dtend
-            location    name
-            description text 
-			if not status =~ /Planned/i
-			  alarm do
-			    description "#{name} #{status.titleize}"
-			  end
+			location    name
+			description text
+
+			if not status =~ /Planned|Good/i
+				alarm do
+					description "#{name} #{status.titleize}"
+				end
 			end
-        end
-  end
+
+		end
+	end
 end
 
 puts cal
