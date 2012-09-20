@@ -6,7 +6,6 @@ require "sanitize"
 require "date"
 require "time"
 
-
 class String
   def titleize
     split(/(\W)/).map(&:capitalize).join
@@ -34,6 +33,7 @@ end
 
 doc = Nokogiri::XML(open "http://www.mta.info/status/serviceStatus.txt")
 
+RiCal::PropertyValue::DateTime::default_tzid = 'America/New_York'
 cal = RiCal.Calendar do
     add_x_property 'X-WR-CALNAME', 'MTA Subway Delays'
     add_x_property 'X-PUBLISHED-TTL', 'PT1M'
@@ -43,18 +43,36 @@ doc.css("line").map do |line|
   name =  line.css("name").first.content
   status = line.css("status").first.content
   text = Sanitize.clean( line.css("text").first.content ).strip
-  dt = line.css('Date').first.content + line.css('Time').first.content
+
+  dt = line.css('Date').first.content + " " + line.css('Time').first.content
+  #puts "DEBUG #{name} #{status} #{dt}"
   dt.strip!
-  #puts "DEBUG #{name} #{status} #{text} #{dt}"
+
+  def dt_end_offset(dt)
+	if dt.hour >= 12 or DateTime.now-dt > 1.0
+	  2
+	else
+	  1
+	end
+  end
+
+  if dt == ''
+	dt = DateTime.parse(Time.now.to_s).to_date
+	dtend = (DateTime.now + dt_end_offset(DateTime.now)).to_date
+  else
+	dt = DateTime.parse(dt).to_datetime
+	dtend = DateTime.parse( (DateTime.now + dt_end_offset(dt) ).to_date.to_s )
+  end
+
   if status != "GOOD SERVICE" and
     not douchebag name and not bus name
         cal.events << RiCal.Event do
             summary "#{name} #{status.titleize}"
-            dtstart     (DateTime.parse(dt!='' ? dt : Time.now.to_s)).to_date
-            dtend       (DateTime.parse(Time.now.to_s) + 1).to_date
+            dtstart     dt
+			dtend       dtend
             location    name
             description text 
-			if not status =~ /Planned/
+			if not status =~ /Planned/i
 			  alarm do
 			    description "#{name} #{status.titleize}"
 			  end
