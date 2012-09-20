@@ -56,7 +56,7 @@ doc.css("line").map do |line|
             description text 
 			if not status =~ /Planned/
 			  alarm do
-			    description "FF #{name} #{status.titleize}"
+			    description "#{name} #{status.titleize}"
 			  end
 			end
         end
