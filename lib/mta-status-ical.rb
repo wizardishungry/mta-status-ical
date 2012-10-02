@@ -64,7 +64,7 @@ doc.css("line").map do |line|
   end
 
 	if text =~ /until ([[:alpha:]]{3} \d+)/
-		puts "FF #{$1}"
+		#puts "FF #{$1}"
 	end
 
   if status != "GOOD SERVICE" and not douchebag name and not bus name
