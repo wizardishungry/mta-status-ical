@@ -5,6 +5,7 @@ require "open-uri"
 require "sanitize"
 require "date"
 require "time"
+require "american_date"
 
 class String
   def titleize
