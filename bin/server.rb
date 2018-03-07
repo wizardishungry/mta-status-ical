@@ -9,5 +9,6 @@ end
 get '/' do
   content_type :ical
   cal = MtaStatusIcal.new
-  cal.run
+  v = cal.run
+  body v
 end

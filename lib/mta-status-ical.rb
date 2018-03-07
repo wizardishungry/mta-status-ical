@@ -90,6 +90,6 @@ class MtaStatusIcal
         end
       end
     end
-    return cal
+    return cal.to_s
   end
 end
