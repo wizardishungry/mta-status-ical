@@ -4,10 +4,12 @@ source "http://rubygems.org"
 #   gem "activesupport", ">= 2.3.5"
 
 gem "ri_cal", ">= 0"
-gem "nokogiri", ">= 0"
+gem "oga", ">= 0"
 gem "sanitize", ">= 0"
 gem "american_date", ">= 0"
 gem 'sinatra'
+gem 'curb'
+
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

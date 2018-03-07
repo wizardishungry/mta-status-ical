@@ -1,11 +1,11 @@
 require "rubygems"
 require "ri_cal"
-require "nokogiri"
-require "open-uri"
+require "oga"
 require "sanitize"
 require "date"
 require "time"
 require "american_date"
+require 'curb'
 
 class String
   def titleize
@@ -34,7 +34,8 @@ class MtaStatusIcal
 
   def run
 
-    doc = Nokogiri::XML(open "http://web.mta.info/status/serviceStatus.txt")
+    http = Curl.get("http://web.mta.info/status/serviceStatus.txt")
+    doc = Oga.parse_xml http.body_str
 
     RiCal::PropertyValue::DateTime::default_tzid = 'America/New_York'
     cal = RiCal.Calendar do
@@ -43,12 +44,12 @@ class MtaStatusIcal
     end
 
     doc.css("line").map do |line|
-      name =  line.css("name").first.content
-      status = line.css("status").first.content
-      text = Sanitize.clean( line.css("text").first.content ).strip
+      name =  line.css("name").first.inner_text
+      status = line.css("status").first.inner_text
+      text = Sanitize.clean( line.css("text").first.inner_text ).strip
 
-      dt = line.css('Date').first.content + " " + line.css('Time').first.content
-      #puts "DEBUG #{name} #{status} #{dt}"
+      dt = line.css('Date').first.inner_text + " " + line.css('Time').first.inner_text
+      STDERR.puts "DEBUG #{name} #{status} #{dt}"
       dt.strip!
 
       def dt_end_offset(dt)
@@ -68,7 +69,8 @@ class MtaStatusIcal
       end
 
       if text =~ /until ([[:alpha:]]{3} \d+)/
-        #puts "FF #{$1}"
+        # FIXME what is this shit
+        STDERR.puts "FF #{$1}"
       end
 
       if status != "GOOD SERVICE" and not douchebag name and not bus name
