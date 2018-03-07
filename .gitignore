@@ -16,5 +16,4 @@ doc
 pkg
 
 *.gemspec
-Gemfile.lock
 pub/*.ics
